@@ -1,0 +1,183 @@
+<Window x:Class="GestureCompanionPointerHost.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Gesture Companion Settings"
+        SizeToContent="WidthAndHeight"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ShowInTaskbar="False"
+        WindowStartupLocation="CenterScreen">
+    <Border CornerRadius="16" Background="#C2161F27" BorderBrush="#66BFE7F3" BorderThickness="1.5" Padding="12">
+        <Border.Resources>
+            <Style x:Key="RoundButtonStyle" TargetType="Button">
+                <Setter Property="Foreground" Value="#F2FAFF"/>
+                <Setter Property="Background" Value="#1E000000"/>
+                <Setter Property="BorderBrush" Value="#55BFE7F3"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="Padding" Value="10,4"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="BtnBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="12">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="BtnBorder" Property="Background" Value="#3A1FA9D6"/>
+                                    <Setter TargetName="BtnBorder" Property="BorderBrush" Value="#88C7F4FF"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="BtnBorder" Property="Background" Value="#46000000"/>
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter TargetName="BtnBorder" Property="Opacity" Value="0.28"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+            <Style x:Key="CloseButtonStyle" TargetType="Button" BasedOn="{StaticResource RoundButtonStyle}">
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="CloseBorder" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="12">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="CloseBorder" Property="Background" Value="#58D94A4A"/>
+                                    <Setter TargetName="CloseBorder" Property="BorderBrush" Value="#B8FF7777"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="CloseBorder" Property="Background" Value="#78A92323"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>            <Style x:Key="GlassyToggleButtonStyle" TargetType="ToggleButton">
+                <Setter Property="Foreground" Value="#CFEFFF"/>
+                <Setter Property="Background" Value="#18000000"/>
+                <Setter Property="BorderBrush" Value="#66BFE7F3"/>
+                <Setter Property="BorderThickness" Value="1"/>
+                <Setter Property="Padding" Value="11,4"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ToggleButton">
+                            <Border x:Name="ToggleBorder" CornerRadius="12"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="ToggleBorder" Property="Background" Value="#321FA9D6"/>
+                                    <Setter TargetName="ToggleBorder" Property="BorderBrush" Value="#A8C7F4FF"/>
+                                </Trigger>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter TargetName="ToggleBorder" Property="Background" Value="#482AAFD4"/>
+                                    <Setter TargetName="ToggleBorder" Property="BorderBrush" Value="#D5D8FAFF"/>
+                                    <Setter Property="Foreground" Value="#FFFFFF"/>
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.45"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>            <Style x:Key="HotkeyRowButtonStyle" TargetType="Button" BasedOn="{StaticResource RoundButtonStyle}">
+                <Setter Property="Width" Value="54"/>
+                <Setter Property="Height" Value="26"/>
+            </Style>
+            <Style x:Key="HotkeyBoxStyle" TargetType="TextBox">
+                <Setter Property="Width" Value="150"/>
+                <Setter Property="Height" Value="26"/>
+                <Setter Property="Padding" Value="6,2"/>
+                <Setter Property="Foreground" Value="#EAF8FF"/>
+                <Setter Property="Background" Value="#15000000"/>
+                <Setter Property="BorderBrush" Value="#44BFE7F3"/>
+                <Setter Property="BorderThickness" Value="1"/>
+            </Style>
+            <Style x:Key="RowLabelStyle" TargetType="TextBlock">
+                <Setter Property="Foreground" Value="#E6F5FF"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+            <Style x:Key="GlassySliderStyle" TargetType="Slider">
+                <Setter Property="Height" Value="24"/>
+                <Setter Property="IsMoveToPointEnabled" Value="True"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Slider">
+                            <Grid Background="Transparent">
+                                <Border Height="20" CornerRadius="3" Background="#32000000"
+                                        BorderBrush="#55BFE7F3" BorderThickness="1" VerticalAlignment="Center"/>
+                                <Track x:Name="PART_Track" Height="18" Margin="1,0" VerticalAlignment="Center">
+                                    <Track.DecreaseRepeatButton>
+                                        <RepeatButton BorderThickness="0" Focusable="False">
+                                            <RepeatButton.Template>
+                                                <ControlTemplate TargetType="RepeatButton">
+                                                    <Border Background="#5931B7D9" CornerRadius="2"/>
+                                                </ControlTemplate>
+                                            </RepeatButton.Template>
+                                        </RepeatButton>
+                                    </Track.DecreaseRepeatButton>
+                                    <Track.Thumb>
+                                        <Thumb Width="0" Height="22" IsHitTestVisible="False">
+                                            <Thumb.Template>
+                                                <ControlTemplate TargetType="Thumb">
+                                                    <Border Background="Transparent"/>
+                                                </ControlTemplate>
+                                            </Thumb.Template>
+                                        </Thumb>
+                                    </Track.Thumb>
+                                    <Track.IncreaseRepeatButton>
+                                        <RepeatButton BorderThickness="0" Focusable="False">
+                                            <RepeatButton.Template>
+                                                <ControlTemplate TargetType="RepeatButton">
+                                                    <Border Background="Transparent"/>
+                                                </ControlTemplate>
+                                            </RepeatButton.Template>
+                                        </RepeatButton>
+                                    </Track.IncreaseRepeatButton>
+                                </Track>
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </Border.Resources>
+
+        <StackPanel Width="620">
+            <Grid Margin="0,0,0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="6"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="6"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="6"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Gesture Companion Settings" FontSize="17" FontWeight="SemiBold"
+                           Foreground="#F2FAFF" VerticalAlignment="Center"/>
+                <Button Grid.Column="1" Content="Reset" Width="68" Height="28"
+                        Style="{StaticResource RoundButtonStyle}" Click="ResetButton_OnClick"/>
+                <Button Grid.Column="3" Content="Default" Width="72" Height="28"
+                        Style="{StaticResource RoundButtonStyle}" Click="DefaultButton_OnClick"/>
+                <Button Grid.Column="5" Content="&#xE73E;" Width="34" Height="28" FontSize="14" FontFamily="Segoe MDL2 Assets"
+                        Style="{StaticResource RoundButtonStyle}" Click="ApplyButton_OnClick" ToolTip="Apply"/>
+                <Button Grid.Column="7" Content="&#xE8BB;" Width="34" Height="28" FontSize="12" FontFamily="Segoe MDL2 Assets"
+                        Style="{StaticResource CloseButtonStyle}" Click="CloseButton_OnClick" ToolTip="Close"/>
+            </Grid>
+            <StackPanel x:Name="RowsPanel"/>
+        </StackPanel>
+    </Border>
+</Window>

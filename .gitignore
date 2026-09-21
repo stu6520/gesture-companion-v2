@@ -1,0 +1,46 @@
+﻿# Visual Studio and .NET build output
+.vs/
+**/bin/
+**/obj/
+**/Debug/
+**/Release/
+**/x64/
+**/x86/
+x64/
+
+# Packaged releases and temporary build output
+release/
+*.zip
+*.7z
+*.msix
+*.msixbundle
+*.appx
+*.appxbundle
+
+# Compiled native and managed binaries
+*.exe
+*.dll
+*.pdb
+*.lib
+*.exp
+*.obj
+*.ilk
+*.tlog
+*.idb
+*.pch
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Runtime files
+*.log
+pointer-host-settings.json
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
