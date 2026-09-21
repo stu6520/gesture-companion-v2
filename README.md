@@ -2,7 +2,7 @@
 
 Gesture Companion adds customizable touch gestures to PaintTool SAI 1 and PaintTool SAI 2. It runs in the Windows system tray, listens for Windows pointer touch input, and connects the correct 32-bit or 64-bit bridge automatically.
 
-This repository contains **source code only**. It does not provide a prebuilt EXE, DLL, ZIP, or installer. Testers must build their own local copy.
+This repository contains **source code only**. It does not provide a prebuilt EXE, DLL, ZIP, or installer. You can build a local copy by following the steps below.
 
 ## Important security disclosure
 
@@ -89,7 +89,8 @@ If gestures do not respond:
 2. Confirm SAI is the foreground application.
 3. Confirm the complete generated `Bridge` folder remains beside the EXE.
 4. Check `%LOCALAPPDATA%\GestureCompanion\bridge.log`.
-5. Include the log, Windows version, SAI version, and touch-device model in a GitHub issue.
+
+If you would like help, you are welcome to open a GitHub issue.
 
 If the build script cannot find MSBuild, install the Visual Studio **Desktop development with C++** workload. The script currently detects common Visual Studio 2022 and newer Community/Build Tools locations.
 
@@ -102,19 +103,6 @@ src/NativePayload/  Native in-process touch bridge
  docs/               User documentation and license
 build-portable.ps1  Local source-build and packaging script
 ```
-
-## Testing feedback
-
-When reporting a problem, include:
-
-- Windows version
-- SAI 1 or SAI 2 and its version
-- Touch-device manufacturer and model
-- Gesture and settings used
-- Exact reproduction steps
-- `%LOCALAPPDATA%\GestureCompanion\bridge.log`
-
-Do not include personal documents or artwork in reports.
 
 ## License and trademark notice
 
