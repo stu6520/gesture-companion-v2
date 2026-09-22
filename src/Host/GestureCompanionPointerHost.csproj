@@ -16,7 +16,8 @@
     <FileVersion>2.0.0.0</FileVersion>
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
     <SelfContained Condition="'$(RuntimeIdentifier)' != ''">true</SelfContained>
-    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <NoWarn>$(NoWarn);WFAC010</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <None Update="icon.ico">
