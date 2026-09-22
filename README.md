@@ -106,6 +106,7 @@ build-portable.ps1  Local source-build and packaging script
 
 ## License and trademark notice
 
-See [docs/LICENSE](docs/LICENSE) before using or modifying this source.
+See [docs/LICENSE](docs/LICENSE) before using or modifying this source. Read the [Privacy Policy](PRIVACY.md) for details about local settings and diagnostic data.
 
 Gesture Companion is an independent utility and is not affiliated with or endorsed by SYSTEMAX or the developers of PaintTool SAI. PaintTool SAI is referenced only to describe compatibility.
+
