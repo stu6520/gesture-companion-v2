@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
@@ -47,6 +47,7 @@ static class BridgeLog
 sealed class TrayAppContext : Forms.ApplicationContext
 {
     private const string StartupValueName = "Gesture Companion Pointer Host";
+    private const string StartupTaskId = "GestureCompanionStartup";
     private readonly Forms.NotifyIcon _trayIcon;
     private readonly Forms.ToolStripMenuItem _startupItem;
     private readonly HostOptions _options;
@@ -62,8 +63,8 @@ sealed class TrayAppContext : Forms.ApplicationContext
         _settings = PointerHostSettings.Load();
         _bridgeManager = new BridgeManager(options);
 
-        _startupItem = new Forms.ToolStripMenuItem("Start with Windows") { Checked = IsStartupEnabled() };
-        _startupItem.Click += (_, _) => ToggleStartup();
+        _startupItem = new Forms.ToolStripMenuItem("Start with Windows");
+        _startupItem.Click += async (_, _) => await ToggleStartupAsync();
 
         var settingsItem = new Forms.ToolStripMenuItem("Settings");
         settingsItem.Click += (_, _) => ShowSettings();
@@ -83,6 +84,7 @@ sealed class TrayAppContext : Forms.ApplicationContext
         _trayIcon.ContextMenuStrip.Items.Add(new Forms.ToolStripSeparator());
         _trayIcon.ContextMenuStrip.Items.Add(quitItem);
         _trayIcon.DoubleClick += (_, _) => ShowSettings();
+        _ = RefreshStartupStateAsync();
         _bridgeManager.FailureWarning += message =>
         {
             try
@@ -154,20 +156,82 @@ sealed class TrayAppContext : Forms.ApplicationContext
         return File.Exists(iconPath) ? new Icon(iconPath) : SystemIcons.Application;
     }
 
-    private void ToggleStartup()
+    private async Task ToggleStartupAsync()
     {
-        SetStartupEnabled(!_startupItem.Checked);
-        _startupItem.Checked = IsStartupEnabled();
+        if (IsPackaged())
+        {
+            try
+            {
+                var task = await Windows.ApplicationModel.StartupTask.GetAsync(StartupTaskId);
+                if (task.State == Windows.ApplicationModel.StartupTaskState.Enabled)
+                {
+                    task.Disable();
+                }
+                else
+                {
+                    await task.RequestEnableAsync();
+                }
+            }
+            catch (Exception exception)
+            {
+                BridgeLog.Write($"StartupTask toggle failed: {exception.GetType().Name}: {exception.Message}");
+            }
+
+            await RefreshStartupStateAsync();
+            return;
+        }
+
+        SetPortableStartupEnabled(!_startupItem.Checked);
+        _startupItem.Checked = IsPortableStartupEnabled();
     }
 
-    private static bool IsStartupEnabled()
+    private async Task RefreshStartupStateAsync()
+    {
+        if (!IsPackaged())
+        {
+            _startupItem.Checked = IsPortableStartupEnabled();
+            return;
+        }
+
+        try
+        {
+            var task = await Windows.ApplicationModel.StartupTask.GetAsync(StartupTaskId);
+            _startupItem.Checked = task.State is Windows.ApplicationModel.StartupTaskState.Enabled
+                or Windows.ApplicationModel.StartupTaskState.EnabledByPolicy;
+            _startupItem.Enabled = task.State is not Windows.ApplicationModel.StartupTaskState.DisabledByPolicy
+                and not Windows.ApplicationModel.StartupTaskState.DisabledByUser;
+            _startupItem.ToolTipText = task.State == Windows.ApplicationModel.StartupTaskState.DisabledByUser
+                ? "Enable Gesture Companion in Windows Startup apps"
+                : string.Empty;
+        }
+        catch (Exception exception)
+        {
+            _startupItem.Enabled = false;
+            BridgeLog.Write($"StartupTask status failed: {exception.GetType().Name}: {exception.Message}");
+        }
+    }
+
+    private static bool IsPackaged()
+    {
+        try
+        {
+            _ = Windows.ApplicationModel.Package.Current.Id;
+            return true;
+        }
+        catch (InvalidOperationException)
+        {
+            return false;
+        }
+    }
+
+    private static bool IsPortableStartupEnabled()
     {
         using var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", false);
         return key?.GetValue(StartupValueName) is string value &&
                value.Contains(Forms.Application.ExecutablePath, StringComparison.OrdinalIgnoreCase);
     }
 
-    private static void SetStartupEnabled(bool enabled)
+    private static void SetPortableStartupEnabled(bool enabled)
     {
         using var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true);
         if (key is null)
@@ -200,10 +264,13 @@ sealed record HostOptions(string BridgeRoot)
 {
     public static HostOptions Parse(string[] args)
     {
-        var packagedBridgeRoot = Path.Combine(AppContext.BaseDirectory, "Bridge");
-        var bridgeRoot = Directory.Exists(packagedBridgeRoot)
-            ? packagedBridgeRoot
-            : FindDevelopmentRoot();
+        var packageLocalBridge = Path.Combine(AppContext.BaseDirectory, "Bridge");
+        var packageRootBridge = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "Bridge"));
+        var bridgeRoot = Directory.Exists(packageLocalBridge)
+            ? packageLocalBridge
+            : Directory.Exists(packageRootBridge)
+                ? packageRootBridge
+                : FindDevelopmentRoot();
         for (var i = 0; i < args.Length; i++)
         {
             if (args[i] == "--bridge-root" && i + 1 < args.Length)
@@ -671,6 +738,9 @@ static class NativeWindow
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool IsWow64Process(IntPtr process, [MarshalAs(UnmanagedType.Bool)] out bool wow64Process);
 }
+
+
+
 
 
 

@@ -44,3 +44,7 @@ pointer-host-settings.json
 Thumbs.db
 .vscode/
 .idea/
+
+# Private Microsoft Store packaging and identity
+GestureCompanion.Package/
+
