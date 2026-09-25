@@ -63,6 +63,8 @@ struct TouchSession
     int peakContacts = 0;
     double maxMovement = 0;
     bool pairValid = false;
+    bool zoomInitiated = false;
+    bool rotateInitiated = false;
     UINT32 pairFirst = 0;
     UINT32 pairSecond = 0;
     PointD pairCentroid{};
@@ -1172,6 +1174,8 @@ void EvaluateManipulation()
     {
         EndPanDrag();
         g_session.pairValid = false;
+        g_session.zoomInitiated = false;
+        g_session.rotateInitiated = false;
         return;
     }
 
@@ -1181,6 +1185,8 @@ void EvaluateManipulation()
         g_session.pairFirst != first->first ||
         g_session.pairSecond != second->first)
     {
+        g_session.zoomInitiated = false;
+        g_session.rotateInitiated = false;
         ResetPairBaseline();
         UpdateDebugSnapshot();
         return;
@@ -1200,10 +1206,24 @@ void EvaluateManipulation()
 
     const double zoomStrength = std::abs(g_session.zoomAccumulator) / zoomStep;
     const double rotateStrength = std::abs(g_session.rotateAccumulator) / rotateStep;
-    bool completedStep = false;
-    if (zoomStrength >= 1 || rotateStrength >= 1)
+    if (zoomStrength >= 1)
     {
-        if (zoomStrength >= rotateStrength)
+        g_session.zoomInitiated = true;
+    }
+    if (rotateStrength >= 1)
+    {
+        g_session.rotateInitiated = true;
+    }
+
+    constexpr double TransformMovementEpsilon = 0.01;
+    const bool zoomCandidate = g_session.zoomInitiated &&
+        std::abs(g_session.zoomAccumulator) >= TransformMovementEpsilon;
+    const bool rotateCandidate = g_session.rotateInitiated &&
+        std::abs(g_session.rotateAccumulator) >= TransformMovementEpsilon;
+    bool completedStep = false;
+    if (zoomCandidate || rotateCandidate)
+    {
+        if (zoomCandidate && (!rotateCandidate || zoomStrength >= rotateStrength))
         {
             completedStep = FireGesture(
                 g_session.zoomAccumulator > 0 ? Gesture::PinchOpen : Gesture::PinchClose,
